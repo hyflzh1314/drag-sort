@@ -17,6 +17,9 @@
     </p>
 
     <h1>拖拽排序</h1>
+    <div>
+      <button @click="add">增加图片</button>
+    </div>
     <drag-sort :list="imgList" :col="4" :w="150" :h="150" :margin="20">
       <template v-slot:default="slot">
         <div class="drag-item">
@@ -24,6 +27,8 @@
         </div>
       </template>
     </drag-sort>
+
+    <div style="height:400px;"></div>
   </div>
 </template>
 
@@ -69,9 +74,17 @@ export default {
     ];
     const state = reactive({ count: 0 });
     const imgList = reactive(data);
+    const add = ()=> {
+      imgList.push({
+        url:
+          "http://img.zgsta.zhuge.com/193-2-1-7-102/97d9067230e8e127053841073cea73e4_addfinger.png",
+        id: 6,
+      }) 
+    }
     return {
       state,
       imgList,
+      add
     };
   },
 };
