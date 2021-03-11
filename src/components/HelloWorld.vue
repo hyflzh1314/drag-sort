@@ -19,10 +19,12 @@
     <h1>拖拽排序</h1>
     <div>
       <button @click="add">增加图片</button>
+      <button @click="done">获取最新数组</button>
     </div>
-    <drag-sort :list="imgList" :col="4" :w="150" :h="150" :margin="20">
+    <drag-sort :list="imgList" :col="3" :w="150" :h="150" :margin="10">
       <template v-slot:default="slot">
         <div class="drag-item">
+          <span class="del" @click="del(slot.item)">x</span>
           <img :src="slot.item.url" />
         </div>
       </template>
@@ -33,7 +35,7 @@
 </template>
 
 <script>
-import { defineProps, reactive } from "vue";
+import { defineProps, reactive, watch } from "vue";
 import DragSort from "@component/DragSort.vue";
 export default {
   props: {
@@ -72,19 +74,37 @@ export default {
         id: 5,
       },
     ];
-    const state = reactive({ count: 0 });
+    const state = reactive({ count: 5 });
     const imgList = reactive(data);
     const add = ()=> {
+      state.count ++
       imgList.push({
         url:
           "http://img.zgsta.zhuge.com/193-2-1-7-102/97d9067230e8e127053841073cea73e4_addfinger.png",
-        id: 6,
+        id: state.count,
       }) 
     }
+    Array.prototype.remove = function(item) {
+      let index = this.indexOf(item)
+      if(index > -1){
+        this.splice(index, 1)
+      }
+    }
+    const del = (item) => {
+      console.log(item)
+      imgList.remove(item)
+    }
+
+    const done = () => {
+      console.log(imgList)
+    }
+
     return {
       state,
       imgList,
-      add
+      add,
+      del,
+      done
     };
   },
 };
@@ -95,14 +115,26 @@ a {
   color: #42b983;
 }
 
-/* .drag-item {
-  margin: 0 20px 20px 0;
-}
-.drag-item:nth-child(4n) {
-  margin-right: 0;
-} */
-.drag-item img {
+.drag-item {
   width: 150px;
   height: 150px;
+  position: relative;
+}
+.drag-item .del {
+  position: absolute;
+	right: -10px;
+	top: -10px;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	line-height: 18px;
+	background-color: #ddd;
+	border-radius: 50%;
+	cursor: pointer;
+	color: #999;
+}
+.drag-item img {
+  width: 100%;
+  height: 100%;
 }
 </style>
