@@ -21,11 +21,12 @@
       <button @click="add">增加图片</button>
       <button @click="done">获取最新数组</button>
     </div>
-    <drag-sort :list="imgList" :col="3" :w="150" :h="150" :margin="10">
+    <drag-sort :list="imgList" :col="3" :w="150" :h="170" :margin="10" :isDrag="isDrag">
       <template v-slot:default="slot">
         <div class="drag-item">
           <span class="del" @click="del(slot.item)">x</span>
-          <img :src="slot.item.url" />
+          <img :src="slot.item.url" @click="imgClick($event)"/>
+          <p>{{ slot.item.id }}</p>
         </div>
       </template>
     </drag-sort>
@@ -35,7 +36,7 @@
 </template>
 
 <script>
-import { defineProps, reactive, watch } from "vue";
+import { defineProps, reactive, ref, watch } from "vue";
 import DragSort from "@component/DragSort.vue";
 export default {
   props: {
@@ -75,6 +76,7 @@ export default {
       },
     ];
     const state = reactive({ count: 5 });
+    const isDrag = ref(false)
     const imgList = reactive(data);
     const add = ()=> {
       state.count ++
@@ -97,14 +99,29 @@ export default {
 
     const done = () => {
       console.log(imgList)
+      console.log(isDrag.value)
     }
 
+    const imgClick = (event) => {
+     console.log(isDrag.value)
+      if(isDrag.value) {
+        isDrag.value = false;
+       
+      } else {
+ 
+      console.log(event.target.src)
+      }
+     
+    }
+   
     return {
       state,
       imgList,
       add,
       del,
-      done
+      done,
+      imgClick,
+      isDrag
     };
   },
 };
@@ -117,7 +134,7 @@ a {
 
 .drag-item {
   width: 150px;
-  height: 150px;
+  height: auto;
   position: relative;
 }
 .drag-item .del {
@@ -135,6 +152,11 @@ a {
 }
 .drag-item img {
   width: 100%;
-  height: 100%;
+  height: 150px;
+}
+.drag-item p {
+  line-height: 20px;
+  background: #eee;
+  margin: 0;
 }
 </style>
