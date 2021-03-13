@@ -1,51 +1,37 @@
 <template>
   <div>
-    <h1>{{ msg }}</h1>
-
-    <p>
-      <a href="https://vitejs.dev/guide/features.html" target="_blank"
-        >Vite Documentation</a
-      >
-      |
-      <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
-    </p>
-
-    <button @click="state.count++">count is: {{ state.count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test hot module replacement.
-    </p>
-
-    <h1>拖拽排序</h1>
+    <h1>拖拽排序，自定义拖拽内容，可增删</h1>
     <div>
       <button @click="add">增加图片</button>
       <button @click="done">获取最新数组</button>
     </div>
-    <drag-sort :list="imgList" :col="3" :w="150" :h="170" :margin="10" :isDrag="isDrag">
+    <drag-sort
+      v-model:list="imgList"
+      :col="3"
+      :w="150"
+      :h="170"
+      :margin="10"
+      v-model:isDrag="isDrag"
+    >
       <template v-slot:default="slot">
         <div class="drag-item">
           <span class="del" @click="del(slot.item)">x</span>
-          <img :src="slot.item.url" @click="imgClick($event)"/>
-          <p>{{ slot.item.id }}</p>
+          <img :src="slot.item.url" @click="imgClick($event)" />
+          <p @click="pClick(slot.item.id)">{{ slot.item.id }}</p>
         </div>
       </template>
     </drag-sort>
 
-    <div style="height:400px;"></div>
+    <div style="height: 400px"></div>
   </div>
 </template>
 
 <script>
-import { defineProps, reactive, ref, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import DragSort from "@component/DragSort.vue";
 export default {
-  props: {
-    msg: {
-      type: String,
-    },
-  },
   components: {
-    DragSort
+    DragSort,
   },
   setup(props) {
     const data = [
@@ -76,44 +62,42 @@ export default {
       },
     ];
     const state = reactive({ count: 5 });
-    const isDrag = ref(false)
+    const isDrag = ref(false);
     const imgList = reactive(data);
-    const add = ()=> {
-      state.count ++
+    const add = () => {
+      state.count++;
       imgList.push({
         url:
           "http://img.zgsta.zhuge.com/193-2-1-7-102/97d9067230e8e127053841073cea73e4_addfinger.png",
         id: state.count,
-      }) 
-    }
-    Array.prototype.remove = function(item) {
-      let index = this.indexOf(item)
-      if(index > -1){
-        this.splice(index, 1)
+      });
+    };
+    Array.prototype.remove = function (item) {
+      let index = this.indexOf(item);
+      if (index > -1) {
+        this.splice(index, 1);
       }
-    }
+    };
     const del = (item) => {
-      console.log(item)
-      imgList.remove(item)
-    }
+      console.log(item);
+      imgList.remove(item);
+    };
 
     const done = () => {
-      console.log(imgList)
-      console.log(isDrag.value)
-    }
+      console.log(imgList);
+      console.log(isDrag);
+    };
 
-    const imgClick = (event) => {
-     console.log(isDrag.value)
-      if(isDrag.value) {
+    const imgClick = event => {
+      if (isDrag.value) {
         isDrag.value = false;
-       
-      } else {
- 
-      console.log(event.target.src)
-      }
-     
+        return false
+      } 
+      console.log(event.target.src);
+    };
+    const pClick = id => {
+      alert(id)
     }
-   
     return {
       state,
       imgList,
@@ -121,7 +105,8 @@ export default {
       del,
       done,
       imgClick,
-      isDrag
+      isDrag,
+      pClick
     };
   },
 };
@@ -139,16 +124,16 @@ a {
 }
 .drag-item .del {
   position: absolute;
-	right: -10px;
-	top: -10px;
-	width: 20px;
-	height: 20px;
-	text-align: center;
-	line-height: 18px;
-	background-color: #ddd;
-	border-radius: 50%;
-	cursor: pointer;
-	color: #999;
+  right: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 18px;
+  background-color: #ddd;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #999;
 }
 .drag-item img {
   width: 100%;

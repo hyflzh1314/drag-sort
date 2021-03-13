@@ -11,7 +11,7 @@
         v-for="(item, index) in list"
         class="drag-container-item"
         :class="{ active: index == active, ani: isAni }"
-        :key="index"
+        :key="`item${index}`"
         :style="{ transform: `translate(${draw(index).x}, ${draw(index).y}` }"
       >
         <slot :item="item"></slot>
@@ -20,9 +20,9 @@
   </div>
 </template>
 <script>
-import { ref, reactive, defineComponent, onMounted, watch } from "vue";
+import { ref, reactive, onMounted, watch } from "vue";
 
-export default defineComponent({
+export default {
   name: "DragSort",
   props: {
     list: {
@@ -45,8 +45,8 @@ export default defineComponent({
       default: 20,
     },
     isDrag: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     }
   },
   setup(props, ctx) {
@@ -68,22 +68,33 @@ export default defineComponent({
       containerWidth.value = itemWidth * col + margin * (col + 1);
     });
 
+    // 列数
     const col = props.col;
+    // 单元宽度
     const itemWidth = props.w;
+    // 单元高度
     const itemHeight = props.h;
+    // 单元间距
     const margin = props.margin;
+    // 数据集合
     const imgList = props.list;
+    // 是否移动，判断是否拖拽
     const isMove = ref(false);
-
+    // 容器宽高
     const containerHeight = ref(0);
     const containerWidth = ref(0);
+    // 当前拖拽单元
     const active = ref(null);
+    // 鼠标是否按下
     const isDown = ref(false);
+    // 是否添加动画
     const isAni = ref(false);
     // 当前拖拽元素
     const dragIndex = ref(0);
     // 拖拽进入区域元素
     const dragEnterIndex = ref(null);
+    // 触发拖拽的距离值
+    const triggerDragDistance = 20;
     // 拖拽距离
     const dragMoveDistance = {
       x: 0,
@@ -125,12 +136,10 @@ export default defineComponent({
         imgList.splice(start + 1, 1);
       }
     };
-
+    // 计算鼠标在容器内的坐标
     const mousePosition = (pageX, pageY) => {
-      // 计算鼠标在容器内的坐标
       let x = pageX - wrapEl.offsetLeft;
       let y = pageY - wrapEl.offsetTop;
-
       return {
         x,
         y,
@@ -149,8 +158,8 @@ export default defineComponent({
       let { x, y } = mousePosition(e.pageX, e.pageY);
       // 判断是否拖拽操作
       if (
-        (Math.abs(x - dragMoveDistance.x) > 20 ||
-          Math.abs(y - dragMoveDistance.y) > 20) &&
+        (Math.abs(x - dragMoveDistance.x) > triggerDragDistance ||
+          Math.abs(y - dragMoveDistance.y) >triggerDragDistance) &&
         isDown.value
       ) {
         isMove.value = true;
@@ -169,17 +178,12 @@ export default defineComponent({
           var translateY = y - itemHeight / 2 + "px";
           el[index].style.transform =
             "translate(" + translateX + "," + translateY + ")";
-        } else {
-          //   el[index].style.transform =
-          //     "translate(" + draw(index).x + "," + draw(index).y + ")";
         }
 
         if (index != dragMoveIndexComputed(x, y) - 1) {
           dragEnterIndex.value = dragMoveIndexComputed(x, y);
         }
-
         isAni.value = false;
-       
       }
     };
     const dragUp = (e) => {
@@ -196,9 +200,7 @@ export default defineComponent({
           isAni.value = true;
           sort(dragIndex.value, dragEnterIndex.value);
           ctx.emit("update:list", imgList);
-         props.isDrag = true;
-        console.log(props.isDrag)
-        ctx.emit("update:isDrag", true);
+          ctx.emit("update:isDrag", true);
         }
       }
       clear();
@@ -237,19 +239,17 @@ export default defineComponent({
       dragUp,
     };
   },
-});
+};
 </script>
 <style  scoped>
 .drag-container {
   position: relative;
-  border: 1px solid #ff0000;
-  width: 800px;
+  border: 1px solid #eee;
 }
-.drag-container-item {
+.drag-container .drag-container-item {
   position: absolute;
   top: 0;
   left: 0;
-  /* transition: all .1s; */
   cursor: pointer;
   user-select: none;
   box-sizing: border-box;
@@ -257,10 +257,6 @@ export default defineComponent({
 .drag-container .drag-container-item.active {
   opacity: 0.8;
   z-index: 99;
-  border: none !important;
-}
-.drag-container .drag-container-item.enter {
-  opacity: 0.6;
 }
 .drag-container .drag-container-item.ani {
   transition: all 0.2s;
