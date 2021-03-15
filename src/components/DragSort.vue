@@ -8,7 +8,7 @@
       @mouseup.prevent="dragUp($event)"
     >
       <div
-        v-for="(item, index) in list"
+        v-for="(item, index) in itemList"
         class="drag-container-item"
         :class="{ active: index == active, ani: isAni }"
         :key="`item${index}`"
@@ -20,23 +20,23 @@
   </div>
 </template>
 <script>
-import { ref, reactive, onMounted, watch } from "vue";
+import { ref, reactive, toRefs, onMounted, watch } from "vue";
 
 export default {
   name: "DragSort",
   props: {
-    list: {
+    itemList: {
       type: Object,
     },
     col: {
       type: Number,
       default: 4,
     },
-    w: {
+    itemWidth: {
       type: Number,
       default: 150,
     },
-    h: {
+    itemHeight: {
       type: Number,
       default: 150,
     },
@@ -64,20 +64,20 @@ export default {
       });
       // 计算父容器宽高
       containerHeight.value =
-        Math.ceil(imgList.length / col) * (itemHeight + margin) + margin;
+        Math.ceil(itemList.length / col) * (itemHeight + margin) + margin;
       containerWidth.value = itemWidth * col + margin * (col + 1);
     });
 
     // 列数
-    const col = props.col;
-    // 单元宽度
-    const itemWidth = props.w;
-    // 单元高度
-    const itemHeight = props.h;
-    // 单元间距
+    const col = props.col
+    // // 单元宽度
+    const itemWidth = props.itemWidth;
+    // // 单元高度
+    const itemHeight = props.itemHeight;
+    // // 单元间距
     const margin = props.margin;
-    // 数据集合
-    const imgList = props.list;
+    // // 数据集合
+    const itemList  = props.itemList;
     // 是否移动，判断是否拖拽
     const isMove = ref(false);
     // 容器宽高
@@ -119,21 +119,21 @@ export default {
       //拖拽进入区域 索引
       let dragMoveIndex = xIndex + (Yindex - 1) * col;
 
-      return dragMoveIndex > imgList.length ? imgList.length : dragMoveIndex;
+      return dragMoveIndex > itemList.length ? itemList.length : dragMoveIndex;
     };
     const sort = (start, end) => {
-      let startEl = imgList[start],
-        endEl = imgList[end];
+      let startEl = itemList[start],
+        endEl = itemList[end];
       if (start < end) {
-        imgList.splice(end, 0, startEl);
-        imgList.splice(start, 1);
+        itemList.splice(end, 0, startEl);
+        itemList.splice(start, 1);
       } else {
         if (end <= 1) {
-          imgList.splice(0, 0, startEl);
+          itemList.splice(0, 0, startEl);
         } else {
-          imgList.splice(end - 1, 0, startEl);
+          itemList.splice(end - 1, 0, startEl);
         }
-        imgList.splice(start + 1, 1);
+        itemList.splice(start + 1, 1);
       }
     };
     // 计算鼠标在容器内的坐标
@@ -199,7 +199,7 @@ export default {
           dragEnterIndex.value = dragMoveIndexComputed(x, y);
           isAni.value = true;
           sort(dragIndex.value, dragEnterIndex.value);
-          ctx.emit("update:list", imgList);
+          ctx.emit("update:itemList", itemList);
           ctx.emit("update:isDrag", true);
         }
       }
@@ -215,14 +215,14 @@ export default {
       active.value = null;
     };
 
-    watch(imgList, (list, prevList) => {
+    watch(itemList, (list, prevList) => {
       containerWidth.value = itemWidth * col + margin * (col + 1);
       containerHeight.value =
         Math.ceil(list.length / col) * (itemHeight + margin) + margin;
     });
 
     return {
-      imgList,
+      itemList,
       containerHeight,
       containerWidth,
       isMove,

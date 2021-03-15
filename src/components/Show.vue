@@ -6,10 +6,10 @@
       <button @click="done">获取最新数组</button>
     </div>
     <drag-sort
-      v-model:list="imgList"
+      v-model:itemList="itemList"
       :col="3"
-      :w="150"
-      :h="170"
+      :itemWidth="150"
+      :itemHeight="170"
       :margin="10"
       v-model:isDrag="isDrag"
     >
@@ -63,10 +63,10 @@ export default {
     ];
     const state = reactive({ count: 5 });
     const isDrag = ref(false);
-    const imgList = reactive(data);
+    const itemList = reactive(data);
     const add = () => {
       state.count++;
-      imgList.push({
+      itemList.push({
         url:
           "http://img.zgsta.zhuge.com/193-2-1-7-102/97d9067230e8e127053841073cea73e4_addfinger.png",
         id: state.count,
@@ -80,11 +80,11 @@ export default {
     };
     const del = (item) => {
       console.log(item);
-      imgList.remove(item);
+      itemList.remove(item);
     };
 
     const done = () => {
-      console.log(imgList);
+      console.log(itemList);
       console.log(isDrag);
     };
 
@@ -100,7 +100,7 @@ export default {
     }
     return {
       state,
-      imgList,
+      itemList,
       add,
       del,
       done,
